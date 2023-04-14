@@ -70,15 +70,40 @@ function MatrixApp() {
     const endTime = performance.now();
     const elapsedTime = endTime - startTime;
     setExecutionTime(elapsedTime);
-
     return () => {
       clearInterval(intervalId);
     };
   }, [moCoord, matrixSize, numBlockingObjects, startCoord, endCoord]);
 
+  // Render the matrix and MO/BOs
+  const renderMatrix = () => {
+    const matrix = [];
+    for (let i = 0; i < matrixSize; i++) {
+      const row = [];
+      for (let j = 0; j < matrixSize; j++) {
+        const isMo = i === moCoord[0] && j === moCoord[1];
+        const isBo = boCoords.some((coord) => coord[0] === i && coord[1] === j);
+        const isStart = i === startCoord[0] && j === startCoord[1];
+        const isEnd = i === endCoord[0] && j === endCoord[1];
+        row.push(
+          <div key={`${i}-${j}`} className={`cell ${isMo ? "mo" : ""} ${isBo ? "bo" : ""} ${isStart ? "start" : ""} ${isEnd ? "end" : ""}`}>
+            {isMo ? "MO" : isBo ? "BO" : ""}
+          </div>
+        );
+      }
+      matrix.push(
+        <div key={`row-${i}`} className="row">
+          {row}
+        </div>
+      );
+    }
+    return matrix;
+  };
+
   return (
     <div className="max-w-3xl mx-auto mt-10 px-6">
       <div className="bg-white shadow-md p-6 rounded-lg">
+        {renderMatrix()}
         <div className="mt-8">
           <h2 className="text-xl font-semibold mb-2">Results</h2>
           <p className="text-gray-700 mb-2">Execution Time: {executionTime.toFixed(2)} ms</p>

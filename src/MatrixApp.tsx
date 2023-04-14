@@ -30,8 +30,51 @@ function MatrixApp() {
       }
     };
 
+    const moveMO = () => {
+      if (moCoord[0] === endCoord[0] && moCoord[1] === endCoord[1]) {
+        return;
+      }
+
+      const newMoCoord = [...moCoord];
+      const direction = Math.floor(Math.random() * 4);
+      const boCoordCheck = (coord, x, y) => coord[0] === x && coord[1] === y;
+      switch (direction) {
+        case 0: // Move up
+          if (newMoCoord[0] > 0 && !boCoords.some((coord) => boCoordCheck(coord, newMoCoord[0] - 1, newMoCoord[1]))) {
+            newMoCoord[0]--;
+          }
+          break;
+        case 1: // Move right
+          if (newMoCoord[1] < matrixSize - 1 && !boCoords.some((coord) => boCoordCheck(coord, newMoCoord[0], newMoCoord[1] + 1))) {
+            newMoCoord[1]++;
+          }
+          break;
+        case 2: // Move down
+          if (newMoCoord[0] < matrixSize - 1 && !boCoords.some((coord) => boCoordCheck(coord, newMoCoord[0] + 1, newMoCoord[1]))) {
+            newMoCoord[0]++;
+          }
+          break;
+        case 3: // Move left
+          if (newMoCoord[1] > 0 && !boCoords.some((coord) => coord[0] === newMoCoord[0] && coord[1] === newMoCoord[1] - 1)) {
+            newMoCoord[1]--;
+          }
+          break;
+        default:
+          break;
+      }
+      setMoCoord(newMoCoord);
+    };
+    const startTime = performance.now();
     generateBlockingObjects();
-  }, []);
+    const intervalId = setInterval(moveMO, 500);
+    const endTime = performance.now();
+    const elapsedTime = endTime - startTime;
+    setExecutionTime(elapsedTime);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [moCoord, matrixSize, numBlockingObjects, startCoord, endCoord]);
 
   return (
     <div className="max-w-3xl mx-auto mt-10 px-6">

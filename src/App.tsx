@@ -1,10 +1,10 @@
 import React from "react";
-import MatrixApp from "./MatrixApp";
+import Matrix from "./Matrix";
 
 function App() {
   return (
     <div className="App">
-      <MatrixApp />
+      <Matrix />
     </div>
   );
 }

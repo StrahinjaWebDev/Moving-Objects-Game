@@ -4,9 +4,11 @@ import { BiObjectsVerticalBottom } from "react-icons/bi";
 import { MdOutlineStart } from "react-icons/md";
 import { GiFinishLine } from "react-icons/gi";
 
+//! TODO: SET START AND END COORDINATES CORRECTLY !!!
+
 function Matrix() {
-  const matrixSize = import.meta.env.VITE_MATRIX_SIZE || 10; //Can be changed in .env file
-  const numberOfBlockingObjects = import.meta.env.VITE_BLOCKING_OBJECTS || 1; //Can be changed in .env file
+  const [matrixSize, setMatrixSize] = useState(import.meta.env.VITE_MATRIX_SIZE || 10); //Can be changed in .env file
+  const [numberOfBlockingObjects, setNumberOfBlockingObjects] = useState(import.meta.env.VITE_BLOCKING_OBJECTS || 3); //Can be changed in .env file
   const [startCoordinates, setStartCoordinates] = useState([import.meta.env.VITE_START_X || 0, import.meta.env.VITE_START_Y || 0]);
   const [endCoordinates, setEndCoordinates] = useState([
     import.meta.env.VITE_END_X || matrixSize - 1,
@@ -15,6 +17,8 @@ function Matrix() {
   const [movingObjectCoordinates, setMovingObjectCoordinates] = useState([startCoordinates[0], startCoordinates[1]]);
   const [blockingObjectCoordinates, setBlockingObjectCoordinates] = useState<number[][]>([]);
   const [executionTime, setExecutionTime] = useState(0);
+  const [movementHistory, setMovementHistory] = useState<number[][]>([]); // Store movement history
+  const [clickCount, setClickCount] = useState(0);
 
   const random = () => {
     return Math.random();
@@ -22,6 +26,11 @@ function Matrix() {
 
   const floor = (number: number) => {
     return Math.floor(number);
+  };
+
+  const handleClick = () => {
+    // Increment the click count
+    setClickCount(clickCount + 1);
   };
 
   useEffect(() => {
@@ -123,7 +132,7 @@ function Matrix() {
         default:
           break;
       }
-
+      setMovementHistory((prevMovementHistory) => [...prevMovementHistory, [...newMovingObjectCoordinates]]);
       setMovingObjectCoordinates(newMovingObjectCoordinates); // Update the MO coordinates with the new coordinates
     };
 
@@ -166,34 +175,73 @@ function Matrix() {
     return matrix;
   };
 
-  return (
-    <div className="max-w-3xl mx-auto mt-10 px-6">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Matrix App</h1>
-        <p className="text-lg mb-2 flex justify-center gap-3">
-          <SiMatrix size={"2rem"} />
-          Matrix Size: {matrixSize}
-        </p>
-        <p className="text-lg mb-2 flex justify-center items-center gap-3">
-          <BiObjectsVerticalBottom size={"2rem"} /> Number of Blocking Objects: {numberOfBlockingObjects}
-        </p>
-        <p className="text-lg mb-2 flex justify-center items-center gap-3">
-          <MdOutlineStart size={"2rem"} /> Start Coordinates: [{startCoordinates[0]}, {startCoordinates[1]}]
-        </p>
-        <p className="text-lg mb-2 flex justify-center items-center gap-3">
-          <GiFinishLine size={"2rem"} /> End Coordinates: [{endCoordinates[0]}, {endCoordinates[1]}]
-        </p>
-      </div>
+  // useEffect(() => {
+  //   // Update the numberOfBlockingObjects state based on the click count
+  //   if (matrixSize === 5) {
+  //     if (clickCount === 1) {
+  //       setNumberOfBlockingObjects(1);
+  //     } else if (clickCount === 2) {
+  //       setNumberOfBlockingObjects(2);
+  //     } else if (clickCount === 3) {
+  //       setNumberOfBlockingObjects(3);
+  //     }
+  //   } else {
+  //     setNumberOfBlockingObjects(import.meta.env.VITE_BLOCKING_OBJECTS || 3);
+  //   }
 
-      <div className="bg-white shadow-md p-6 rounded-lg">
-        {renderMatrix()}
-        <div className="mt-8">
-          <h2 className="text-xl font-semibold mb-2">Results</h2>
-          <p className="text-gray-700 mb-2">Execution Time: {executionTime.toFixed(2)} ms</p>
-          <p className="text-gray-700 mb-2">Moving Object Coordinates: {JSON.stringify(movingObjectCoordinates)}</p>
-          <p className="text-gray-700">Blocking Object Coordinates: {JSON.stringify(blockingObjectCoordinates)}</p>
+  // }, [clickCount]);  //! MAKE THIS FUNCTION WORK PROPER
+
+  // console.log({
+  //   movingObjectCoordinates: movingObjectCoordinates,
+  //   blockingObjectCoordinates: blockingObjectCoordinates,
+  // }); //! IF The result should be an array of objects containing movingObjectCoordinates and blockingObjetsCoordinates keys, this should be in the log
+
+  return (
+    <div className="flex flex-col justify-center items-center w-screen h-[80vh] gap-12">
+      <h1 className="text-4xl font-semibold">Matrix Visualization</h1>
+      <div className="flex flex-row gap-12">
+        <div>
+          <p className="font-bold text-xl">Matrix Size</p>
+          <input type="number" value={matrixSize} onChange={(e) => setMatrixSize(e.target.value)} />
+        </div>
+        <div>
+          <p className="font-bold text-xl">Number of Blocking Objects</p>
+          <input type="number" value={numberOfBlockingObjects} onChange={(e) => setNumberOfBlockingObjects(parseInt(e.target.value))} />
+        </div>
+        <div>
+          <p className="font-bold text-xl">Start Coordinates</p>
+          <input type="number" value={startCoordinates} onChange={(e) => setStartCoordinates(e.target.value)} />
+        </div>
+        <div>
+          <p className="font-bold text-xl">End Coordinates</p>
+          <input type="number" value={endCoordinates} onChange={(e) => setEndCoordinates(e.target.value)} />
         </div>
       </div>
+      <div style={{ display: "grid", gridTemplateColumns: `repeat(${matrixSize}, 30px)`, gap: "5px" }}>
+        {Array.from({ length: matrixSize * matrixSize }).map((_, index) => {
+          const row = Math.floor(index / matrixSize);
+          const col = index % matrixSize;
+          const isStart = startCoordinates[0] === row && startCoordinates[1] === col;
+          const isEnd = endCoordinates[0] === row && endCoordinates[1] === col;
+          const isMO = movingObjectCoordinates[0] === row && movingObjectCoordinates[1] === col;
+          const isBO = blockingObjectCoordinates.some(([x, y]) => x === row && y === col);
+          const isMovementHistory = movementHistory.some(([x, y]) => x === row && y === col); // Check if current cell is in movement history
+
+          let boxStyle = {
+            width: "30px",
+            height: "30px",
+            border: isMovementHistory ? "2px solid blue" : "1px solid #000", // Apply style for movement history
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: isStart ? "green" : isEnd ? "red" : isMO ? "blue" : isBO ? "gray" : "transparent",
+            color: isMO ? "#fff" : "#000",
+          };
+
+          return <div key={index} style={boxStyle}></div>;
+        })}
+      </div>
+      <button onClick={handleClick}>5X5</button>
     </div>
   );
 }

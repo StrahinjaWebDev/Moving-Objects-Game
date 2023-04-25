@@ -4,7 +4,10 @@ import { BiObjectsVerticalBottom } from "react-icons/bi";
 import { MdOutlineStart } from "react-icons/md";
 import { GiFinishLine } from "react-icons/gi";
 
-//! TODO: SET START AND END COORDINATES CORRECTLY !!!
+//! TODO: SET START AND END COORDINATES CORRECTLY in input  !!!
+
+//! TODO: HANDLE CLICK CHANGES OBJECT IN EVERY MATRIX SIZE IT SHOULD
+//! ON 5X5 CHANGE ONLY IF MATRIX SIZE === 5 ON 10X10 === 10 SIZE ETC.
 
 function Matrix() {
   const [matrixSize, setMatrixSize] = useState(import.meta.env.VITE_MATRIX_SIZE || 10); //Can be changed in .env file
@@ -28,9 +31,81 @@ function Matrix() {
     return Math.floor(number);
   };
 
-  const handleClick = () => {
-    // Increment the click count
-    setClickCount(clickCount + 1);
+  const handleButtonClick5x5 = () => {
+    setClickCount((prevClickCount) => prevClickCount + 1);
+
+    switch (clickCount) {
+      case 0:
+        setNumberOfBlockingObjects(1);
+        break;
+      case 1:
+        setNumberOfBlockingObjects(2);
+        break;
+      case 2:
+        setNumberOfBlockingObjects(3);
+        break;
+      default:
+        setNumberOfBlockingObjects(0);
+        setNumberOfBlockingObjects(import.meta.env.VITE_BLOCKING_OBJECTS || 3);
+    }
+  };
+
+  const handleButtonClick10x10 = () => {
+    setClickCount((prevClickCount) => prevClickCount + 1);
+
+    switch (clickCount) {
+      case 0:
+        setNumberOfBlockingObjects(2);
+        break;
+      case 1:
+        setNumberOfBlockingObjects(3);
+        break;
+      case 2:
+        setNumberOfBlockingObjects(4);
+        break;
+      default:
+        setNumberOfBlockingObjects(0);
+        setNumberOfBlockingObjects(import.meta.env.VITE_BLOCKING_OBJECTS || 3);
+    }
+  };
+
+  const handleButtonClick20x20 = () => {
+    setClickCount((prevClickCount) => prevClickCount + 1);
+
+    switch (clickCount) {
+      case 0:
+        setNumberOfBlockingObjects(3);
+        break;
+      case 1:
+        setNumberOfBlockingObjects(4);
+        break;
+      case 2:
+        setNumberOfBlockingObjects(5);
+        break;
+      default:
+        setNumberOfBlockingObjects(0);
+        setNumberOfBlockingObjects(import.meta.env.VITE_BLOCKING_OBJECTS || 3);
+    }
+  };
+
+  const handleStartXChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newX = parseInt(event.target.value);
+    setStartCoordinates((prevCoords) => [newX, prevCoords[1]]);
+  };
+
+  const handleStartYChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newY = parseInt(event.target.value);
+    setStartCoordinates((prevCoords) => [prevCoords[0], newY]);
+  };
+
+  const handleEndXChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newX = parseInt(event.target.value);
+    setEndCoordinates((prevCoords) => [newX, prevCoords[1]]);
+  };
+
+  const handleEndYChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newY = parseInt(event.target.value);
+    setEndCoordinates((prevCoords) => [prevCoords[0], newY]);
   };
 
   useEffect(() => {
@@ -148,53 +223,10 @@ function Matrix() {
     };
   }, [movingObjectCoordinates, matrixSize, numberOfBlockingObjects, startCoordinates, endCoordinates]);
 
-  // Render the matrix and MO/BOs
-  const renderMatrix = () => {
-    const matrix = [];
-    for (let i = 0; i < matrixSize; i++) {
-      const row = [];
-      for (let j = 0; j < matrixSize; j++) {
-        const isMovingObject = i === movingObjectCoordinates[0] && j === movingObjectCoordinates[1]; // Check if current cell is MO
-        const isBlockingObject = blockingObjectCoordinates.some((coordinates) => coordinates[0] === i && coordinates[1] === j); // Check if current cell is BO
-        const isStart = i === startCoordinates[0] && j === startCoordinates[1]; // Check if current cell is start point
-        const isEnd = i === endCoordinates[0] && j === endCoordinates[1]; // Check if current cell is end point
-        row.push(
-          <div
-            key={`${i}-${j}`}
-            className={`${isMovingObject ? "Moving Object" : ""} ${isBlockingObject ? "Blocking Object" : ""} ${isStart ? "Start" : ""} ${
-              isEnd ? "End" : ""
-            }`}
-          >
-            {isMovingObject ? "Moving Object" : isBlockingObject ? "Blocking Object" : ""}
-          </div>
-        );
-      }
-      matrix.push(<div key={`${i}`}>{row}</div>);
-    }
-
-    return matrix;
-  };
-
-  // useEffect(() => {
-  //   // Update the numberOfBlockingObjects state based on the click count
-  //   if (matrixSize === 5) {
-  //     if (clickCount === 1) {
-  //       setNumberOfBlockingObjects(1);
-  //     } else if (clickCount === 2) {
-  //       setNumberOfBlockingObjects(2);
-  //     } else if (clickCount === 3) {
-  //       setNumberOfBlockingObjects(3);
-  //     }
-  //   } else {
-  //     setNumberOfBlockingObjects(import.meta.env.VITE_BLOCKING_OBJECTS || 3);
-  //   }
-
-  // }, [clickCount]);  //! MAKE THIS FUNCTION WORK PROPER
-
   // console.log({
-  //   movingObjectCoordinates: movingObjectCoordinates,
+  //   movingObjectCoordinates: movementHistory, //! SEE IF IT IS HISTORY OR OLNLY MOVMENT!
   //   blockingObjectCoordinates: blockingObjectCoordinates,
-  // }); //! IF The result should be an array of objects containing movingObjectCoordinates and blockingObjetsCoordinates keys, this should be in the log
+  // }); //! IF The result should be an array of objects containing movingObjectCoordinates and blockingObjetsCoordinates keys, this should be in the log !!!DONE!!!
 
   return (
     <div className="flex flex-col justify-center items-center w-screen h-[80vh] gap-12">
@@ -209,12 +241,25 @@ function Matrix() {
           <input type="number" value={numberOfBlockingObjects} onChange={(e) => setNumberOfBlockingObjects(parseInt(e.target.value))} />
         </div>
         <div>
-          <p className="font-bold text-xl">Start Coordinates</p>
-          <input type="number" value={startCoordinates} onChange={(e) => setStartCoordinates(e.target.value)} />
+          <label>
+            Start X:
+            <input type="number" value={startCoordinates[0]} onChange={handleStartXChange} />
+          </label>
+          <label>
+            Start Y:
+            <input type="number" value={startCoordinates[1]} onChange={handleStartYChange} />
+          </label>
         </div>
+
         <div>
-          <p className="font-bold text-xl">End Coordinates</p>
-          <input type="number" value={endCoordinates} onChange={(e) => setEndCoordinates(e.target.value)} />
+          <label>
+            End X:
+            <input type="number" value={startCoordinates[0]} onChange={handleEndXChange} />
+          </label>
+          <label>
+            End Y:
+            <input type="number" value={startCoordinates[1]} onChange={handleEndYChange} />
+          </label>
         </div>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: `repeat(${matrixSize}, 30px)`, gap: "5px" }}>
@@ -241,7 +286,9 @@ function Matrix() {
           return <div key={index} style={boxStyle}></div>;
         })}
       </div>
-      <button onClick={handleClick}>5X5</button>
+      <button onClick={handleButtonClick5x5}>5x5</button>
+      <button onClick={handleButtonClick10x10}>10x10</button>
+      <button onClick={handleButtonClick20x20}>20x20</button>
     </div>
   );
 }

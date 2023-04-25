@@ -6,11 +6,8 @@ import { GiFinishLine } from "react-icons/gi";
 
 //! TODO: SET START CORRECTLY in input  !!!
 
-//! TODO: HANDLE CLICK CHANGES OBJECT IN EVERY MATRIX SIZE IT SHOULD
-//! ON 5X5 CHANGE ONLY IF MATRIX SIZE === 5 ON 10X10 === 10 SIZE ETC.
-
 function Matrix() {
-  const [matrixSize, setMatrixSize] = useState(import.meta.env.VITE_MATRIX_SIZE || 10); //Can be changed in .env file
+  const [matrixSize, setMatrixSize] = useState(import.meta.env.VITE_MATRIX_SIZE || 5); //Can be changed in .env file
   const [numberOfBlockingObjects, setNumberOfBlockingObjects] = useState(import.meta.env.VITE_BLOCKING_OBJECTS || 3); //Can be changed in .env file
   const [startCoordinates, setStartCoordinates] = useState([import.meta.env.VITE_START_X || 0, import.meta.env.VITE_START_Y || 0]);
   const [endCoordinates, setEndCoordinates] = useState([
@@ -32,59 +29,62 @@ function Matrix() {
   };
 
   const handleButtonClick5x5 = () => {
-    setClickCount((prevClickCount) => prevClickCount + 1);
-
-    switch (clickCount) {
-      case 0:
-        setNumberOfBlockingObjects(1);
-        break;
-      case 1:
-        setNumberOfBlockingObjects(2);
-        break;
-      case 2:
-        setNumberOfBlockingObjects(3);
-        break;
-      default:
-        setNumberOfBlockingObjects(0);
-        setNumberOfBlockingObjects(import.meta.env.VITE_BLOCKING_OBJECTS || 3);
+    if (matrixSize === "5") {
+      setClickCount((prevClickCount) => prevClickCount + 1);
+      switch (clickCount) {
+        case 0:
+          setNumberOfBlockingObjects(1);
+          break;
+        case 1:
+          setNumberOfBlockingObjects(2);
+          break;
+        case 2:
+          setNumberOfBlockingObjects(3);
+          break;
+        default:
+          setNumberOfBlockingObjects(0);
+          setNumberOfBlockingObjects(import.meta.env.VITE_BLOCKING_OBJECTS || 3);
+      }
     }
   };
 
   const handleButtonClick10x10 = () => {
-    setClickCount((prevClickCount) => prevClickCount + 1);
-
-    switch (clickCount) {
-      case 0:
-        setNumberOfBlockingObjects(2);
-        break;
-      case 1:
-        setNumberOfBlockingObjects(3);
-        break;
-      case 2:
-        setNumberOfBlockingObjects(4);
-        break;
-      default:
-        setNumberOfBlockingObjects(0);
-        setNumberOfBlockingObjects(import.meta.env.VITE_BLOCKING_OBJECTS || 3);
+    if (matrixSize === "10") {
+      setClickCount((prevClickCount) => prevClickCount + 1);
+      switch (clickCount) {
+        case 0:
+          setNumberOfBlockingObjects(2);
+          break;
+        case 1:
+          setNumberOfBlockingObjects(3);
+          break;
+        case 2:
+          setNumberOfBlockingObjects(4);
+          break;
+        default:
+          setNumberOfBlockingObjects(0);
+          setNumberOfBlockingObjects(import.meta.env.VITE_BLOCKING_OBJECTS || 3);
+      }
     }
   };
 
   const handleButtonClick20x20 = () => {
-    setClickCount((prevClickCount) => prevClickCount + 1);
-
-    switch (clickCount) {
-      case 0:
-        setNumberOfBlockingObjects(3);
-        break;
-      case 1:
-        setNumberOfBlockingObjects(4);
-        break;
-      case 2:
-        setNumberOfBlockingObjects(5);
-        break;
-      default:
-        setNumberOfBlockingObjects(0);
-        setNumberOfBlockingObjects(import.meta.env.VITE_BLOCKING_OBJECTS || 3);
+    if (matrixSize === "20") {
+      setClickCount((prevClickCount) => prevClickCount + 1);
+      switch (clickCount) {
+        case 0:
+          setNumberOfBlockingObjects(3);
+          break;
+        case 1:
+          setNumberOfBlockingObjects(4);
+          break;
+        case 2:
+          setNumberOfBlockingObjects(5);
+          break;
+        default:
+          setNumberOfBlockingObjects(0);
+          setNumberOfBlockingObjects(import.meta.env.VITE_BLOCKING_OBJECTS || 3);
+      }
     }
   };
 
@@ -287,8 +287,11 @@ function Matrix() {
         })}
       </div>
       <button onClick={handleButtonClick5x5}>5x5</button>
+      //! Works only if matrix is 5x5
       <button onClick={handleButtonClick10x10}>10x10</button>
+      //! Works only if matrix is 10x10
       <button onClick={handleButtonClick20x20}>20x20</button>
+      //! Works only if matrix is 20x20
     </div>
   );
 }

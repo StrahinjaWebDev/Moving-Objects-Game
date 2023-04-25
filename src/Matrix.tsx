@@ -229,39 +229,8 @@ function Matrix() {
   // }); //! IF The result should be an array of objects containing movingObjectCoordinates and blockingObjetsCoordinates keys, this should be in the log !!!DONE!!!
 
   return (
-    <div className="flex flex-col justify-center items-center w-screen h-[80vh] gap-12">
+    <div className="flex flex-col items-center w-screen h-[200vh] gap-12 mt-12">
       <h1 className="text-4xl font-semibold">Matrix Visualization</h1>
-      <div className="flex flex-row gap-12">
-        <div>
-          <p className="font-bold text-xl">Matrix Size</p>
-          <input type="number" value={matrixSize} onChange={(e) => setMatrixSize(e.target.value)} />
-        </div>
-        <div>
-          <p className="font-bold text-xl">Number of Blocking Objects</p>
-          <input type="number" value={numberOfBlockingObjects} onChange={(e) => setNumberOfBlockingObjects(parseInt(e.target.value))} />
-        </div>
-        <div className="flex flex-row">
-          <label>
-            Start X:
-            <input type="number" value={startCoordinates[0]} onChange={handleStartXChange} />
-          </label>
-          <label>
-            Start Y:
-            <input type="number" value={startCoordinates[1]} onChange={handleStartYChange} />
-          </label>
-        </div>
-
-        <div>
-          <label>
-            End X:
-            <input type="number" value={endCoordinates[0]} onChange={handleEndXChange} />
-          </label>
-          <label>
-            End Y:
-            <input type="number" value={endCoordinates[1]} onChange={handleEndYChange} />
-          </label>
-        </div>
-      </div>
       <div style={{ display: "grid", gridTemplateColumns: `repeat(${matrixSize}, 30px)`, gap: "5px" }}>
         {Array.from({ length: matrixSize * matrixSize }).map((_, index) => {
           const row = Math.floor(index / matrixSize);
@@ -285,6 +254,73 @@ function Matrix() {
 
           return <div key={index} style={boxStyle}></div>;
         })}
+      </div>
+      <div className="flex flex-row gap-12">
+        <div className="flex flex-col gap-3">
+          <p className="font-bold text-2xl flex gap-3">
+            <SiMatrix size={"1.4em"} /> Matrix Size
+          </p>
+          <input
+            className="border-2 rounded-xl border-black hover:border-blue-500"
+            type="number"
+            value={matrixSize}
+            onChange={(e) => setMatrixSize(e.target.value)}
+          />
+        </div>
+        <div className="flex flex-col gap-3">
+          <p className="font-bold text-xl flex gap-3">
+            <BiObjectsVerticalBottom size={"2em"} /> Number of Blocking Objects
+          </p>
+          <input
+            className="border-2 rounded-xl border-black hover:border-blue-500 w-[70%] "
+            type="number"
+            value={numberOfBlockingObjects}
+            onChange={(e) => setNumberOfBlockingObjects(parseInt(e.target.value))}
+          />
+        </div>
+        <div className="flex flex-col gap-3">
+          <p className="text-xl font-bold">Start Coordinates:</p>
+          <p>
+            Start X:
+            <input
+              className="border-2 rounded-xl border-black hover:border-blue-500"
+              type="number"
+              value={startCoordinates[0]}
+              onChange={handleStartXChange}
+            />
+          </p>
+          <label>
+            Start Y:
+            <input
+              className="border-2 rounded-xl border-black hover:border-blue-500"
+              type="number"
+              value={startCoordinates[1]}
+              onChange={handleStartYChange}
+            />
+          </label>
+        </div>
+
+        <div className="flex flex-col gap-3">
+          <p className="text-xl font-bold">End Coordinates:</p>
+          <label>
+            End X:
+            <input
+              className="border-2 rounded-xl border-black hover:border-blue-500"
+              type="number"
+              value={endCoordinates[0]}
+              onChange={handleEndXChange}
+            />
+          </label>
+          <label>
+            End Y:
+            <input
+              className="border-2 rounded-xl border-black hover:border-blue-500 "
+              type="number"
+              value={endCoordinates[1]}
+              onChange={handleEndYChange}
+            />
+          </label>
+        </div>
       </div>
       <button onClick={handleButtonClick5x5}>5x5</button>
       //! Works only if matrix is 5x5

@@ -4,7 +4,7 @@ import { BiObjectsVerticalBottom } from "react-icons/bi";
 import { MdOutlineStart } from "react-icons/md";
 import { GiFinishLine } from "react-icons/gi";
 
-//! TODO: SET START AND END COORDINATES CORRECTLY in input  !!!
+//! TODO: SET START CORRECTLY in input  !!!
 
 //! TODO: HANDLE CLICK CHANGES OBJECT IN EVERY MATRIX SIZE IT SHOULD
 //! ON 5X5 CHANGE ONLY IF MATRIX SIZE === 5 ON 10X10 === 10 SIZE ETC.
@@ -240,7 +240,7 @@ function Matrix() {
           <p className="font-bold text-xl">Number of Blocking Objects</p>
           <input type="number" value={numberOfBlockingObjects} onChange={(e) => setNumberOfBlockingObjects(parseInt(e.target.value))} />
         </div>
-        <div>
+        <div className="flex flex-row">
           <label>
             Start X:
             <input type="number" value={startCoordinates[0]} onChange={handleStartXChange} />
@@ -254,11 +254,11 @@ function Matrix() {
         <div>
           <label>
             End X:
-            <input type="number" value={startCoordinates[0]} onChange={handleEndXChange} />
+            <input type="number" value={endCoordinates[0]} onChange={handleEndXChange} />
           </label>
           <label>
             End Y:
-            <input type="number" value={startCoordinates[1]} onChange={handleEndYChange} />
+            <input type="number" value={endCoordinates[1]} onChange={handleEndYChange} />
           </label>
         </div>
       </div>

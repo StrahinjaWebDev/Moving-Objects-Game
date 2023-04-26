@@ -4,8 +4,6 @@ import { BiObjectsVerticalBottom } from "react-icons/bi";
 import { MdOutlineStart } from "react-icons/md";
 import { GiFinishLine } from "react-icons/gi";
 
-//! TODO: SET START CORRECTLY in input  !!!
-
 function Matrix() {
   const [matrixSize, setMatrixSize] = useState(import.meta.env.VITE_MATRIX_SIZE || 5); //Can be changed in .env file
   const [numberOfBlockingObjects, setNumberOfBlockingObjects] = useState(import.meta.env.VITE_BLOCKING_OBJECTS || 3); //Can be changed in .env file
@@ -17,7 +15,7 @@ function Matrix() {
   const [movingObjectCoordinates, setMovingObjectCoordinates] = useState([startCoordinates[0], startCoordinates[1]]);
   const [blockingObjectCoordinates, setBlockingObjectCoordinates] = useState<number[][]>([]);
   const [executionTime, setExecutionTime] = useState(0);
-  const [movementHistory, setMovementHistory] = useState<number[][]>([]); // Store movement history
+  const [movementHistory, setMovementHistory] = useState<number[][]>([]);
   const [clickCount, setClickCount] = useState(0);
 
   const random = () => {
@@ -42,8 +40,6 @@ function Matrix() {
           setNumberOfBlockingObjects(3);
           break;
         default:
-          setNumberOfBlockingObjects(0);
-          setNumberOfBlockingObjects(import.meta.env.VITE_BLOCKING_OBJECTS || 3);
       }
     }
   };
@@ -62,8 +58,6 @@ function Matrix() {
           setNumberOfBlockingObjects(4);
           break;
         default:
-          setNumberOfBlockingObjects(0);
-          setNumberOfBlockingObjects(import.meta.env.VITE_BLOCKING_OBJECTS || 3);
       }
     }
   };
@@ -82,8 +76,6 @@ function Matrix() {
           setNumberOfBlockingObjects(5);
           break;
         default:
-          setNumberOfBlockingObjects(0);
-          setNumberOfBlockingObjects(import.meta.env.VITE_BLOCKING_OBJECTS || 3);
       }
     }
   };
@@ -219,37 +211,38 @@ function Matrix() {
     setExecutionTime(elapsedTime);
 
     return () => {
-      clearInterval(intervalId); // Clear the interval when the component unmounts
+      clearInterval(intervalId);
     };
   }, [movingObjectCoordinates, matrixSize, numberOfBlockingObjects, startCoordinates, endCoordinates]);
 
-  // console.log({
-  //   movingObjectCoordinates: movementHistory, //! SEE IF IT IS HISTORY OR OLNLY MOVMENT!
-  //   blockingObjectCoordinates: blockingObjectCoordinates,
-  // }); //! IF The result should be an array of objects containing movingObjectCoordinates and blockingObjetsCoordinates keys, this should be in the log !!!DONE!!!
-
+  console.log({ movingObjectCoordinates, blockingObjectCoordinates });
   return (
-    <div className="flex flex-col items-center w-screen h-[200vh] gap-12 mt-12">
+    <div className="flex flex-col items-center w-screen h-[200vh] gap-12  bg-gray-300">
       <h1 className="text-4xl font-semibold">Matrix Visualization</h1>
       <div style={{ display: "grid", gridTemplateColumns: `repeat(${matrixSize}, 30px)`, gap: "5px" }}>
         {Array.from({ length: matrixSize * matrixSize }).map((_, index) => {
-          const row = Math.floor(index / matrixSize);
-          const col = index % matrixSize;
-          const isStart = startCoordinates[0] === row && startCoordinates[1] === col;
-          const isEnd = endCoordinates[0] === row && endCoordinates[1] === col;
-          const isMO = movingObjectCoordinates[0] === row && movingObjectCoordinates[1] === col;
-          const isBO = blockingObjectCoordinates.some(([x, y]) => x === row && y === col);
-          const isMovementHistory = movementHistory.some(([x, y]) => x === row && y === col); // Check if current cell is in movement history
+          const [row, col] = [Math.floor(index / matrixSize), index % matrixSize];
+          const isCellOccupied =
+            startCoordinates[0] === row && startCoordinates[1] === col
+              ? "green"
+              : endCoordinates[0] === row && endCoordinates[1] === col
+              ? "red"
+              : movingObjectCoordinates[0] === row && movingObjectCoordinates[1] === col
+              ? "blue"
+              : blockingObjectCoordinates.some(([x, y]) => x === row && y === col)
+              ? "gray"
+              : "transparent";
 
-          let boxStyle = {
+          const isMovementHistory = movementHistory.some(([x, y]) => x === row && y === col);
+          const boxStyle = {
             width: "30px",
             height: "30px",
-            border: isMovementHistory ? "2px solid blue" : "1px solid #000", // Apply style for movement history
+            border: isMovementHistory ? "2px solid blue" : "1px solid #000",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            backgroundColor: isStart ? "green" : isEnd ? "red" : isMO ? "blue" : isBO ? "gray" : "transparent",
-            color: isMO ? "#fff" : "#000",
+            backgroundColor: isCellOccupied,
+            color: isCellOccupied === "blue" ? "#fff" : "#000",
           };
 
           return <div key={index} style={boxStyle}></div>;
@@ -279,8 +272,10 @@ function Matrix() {
           />
         </div>
         <div className="flex flex-col gap-3">
-          <p className="text-xl font-bold">Start Coordinates:</p>
-          <p>
+          <p className="text-xl flex font-bold gap-3">
+            <MdOutlineStart size={"1.3em"} /> Start Coordinates:
+          </p>
+          <p className="font-semibold flex gap-3">
             Start X:
             <input
               className="border-2 rounded-xl border-black hover:border-blue-500"
@@ -289,7 +284,7 @@ function Matrix() {
               onChange={handleStartXChange}
             />
           </p>
-          <label>
+          <p className="font-semibold flex gap-3">
             Start Y:
             <input
               className="border-2 rounded-xl border-black hover:border-blue-500"
@@ -297,12 +292,14 @@ function Matrix() {
               value={startCoordinates[1]}
               onChange={handleStartYChange}
             />
-          </label>
+          </p>
         </div>
 
         <div className="flex flex-col gap-3">
-          <p className="text-xl font-bold">End Coordinates:</p>
-          <label>
+          <p className="text-xl font-bold flex gap-3">
+            <GiFinishLine size={"1.8em"} /> End Coordinates:
+          </p>
+          <p className="font-semibold flex gap-3">
             End X:
             <input
               className="border-2 rounded-xl border-black hover:border-blue-500"
@@ -310,8 +307,8 @@ function Matrix() {
               value={endCoordinates[0]}
               onChange={handleEndXChange}
             />
-          </label>
-          <label>
+          </p>
+          <p className="font-semibold flex gap-3">
             End Y:
             <input
               className="border-2 rounded-xl border-black hover:border-blue-500 "
@@ -319,15 +316,29 @@ function Matrix() {
               value={endCoordinates[1]}
               onChange={handleEndYChange}
             />
-          </label>
+          </p>
         </div>
       </div>
-      <button onClick={handleButtonClick5x5}>5x5</button>
-      //! Works only if matrix is 5x5
-      <button onClick={handleButtonClick10x10}>10x10</button>
-      //! Works only if matrix is 10x10
-      <button onClick={handleButtonClick20x20}>20x20</button>
-      //! Works only if matrix is 20x20
+      <div className="flex flex-row gap-12">
+        <div className="flex flex-col justify-center gap-3">
+          <button className="border-black border-2 rounded-full bg-blue-500 hover:opacity-75" onClick={handleButtonClick5x5}>
+            5x5
+          </button>
+          <p className="animate-bounce text-red-500 font-medium"> (Works only if matrix is 5x5)</p>
+        </div>
+        <div className="flex flex-col justify-center gap-3">
+          <button className="border-black border-2 rounded-full bg-blue-500 hover:opacity-75" onClick={handleButtonClick10x10}>
+            10x10{" "}
+          </button>
+          <p className="animate-bounce text-red-500 font-medium">(Works only if matrix is 10x10)</p>
+        </div>
+        <div className="flex flex-col justify-center gap-3">
+          <button className="border-black border-2 rounded-full bg-blue-500 hover:opacity-75" onClick={handleButtonClick20x20}>
+            20x20
+          </button>
+          <p className="animate-bounce text-red-500 font-medium">(Works only if matrix is 20x20)</p>
+        </div>
+      </div>
     </div>
   );
 }
